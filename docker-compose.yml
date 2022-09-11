@@ -1,0 +1,32 @@
+version: "3.4"
+
+services:
+  mysql-db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    container_name: mysql
+    environment:
+      MYSQL_HOST: localhost
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - 3306:3306
+    restart: unless-stopped
+  server:
+    build: ./server
+    container_name: server
+    depends_on:
+     - mysql-db
+    ports:
+      - 8000:8000
+    links:
+      - mysql-db
+    restart: always
+    volumes: 
+      - ./server:/app/server
+  apache-react:
+    platform: linux/x86_64
+    container_name: ReactApp
+    build: ./client
+    ports:
+      - 80:80
+      - 443:443
